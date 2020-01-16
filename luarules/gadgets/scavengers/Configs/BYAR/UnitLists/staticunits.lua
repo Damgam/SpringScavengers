@@ -1,8 +1,15 @@
 NoSelfdList = {
 "cormaw",
 "armclaw",
-"cornanotc",
-"armnanotc",
-"armcom",
-"corcom",
+
+
+-- These operate through other modules
+--"cornanotc",
+--"armnanotc",
+--"armnanotcplat",
+--"cornanotcplat",
+--"armcom",
+--"corcom",
+--"armrectr",
+--"cornecro",
 }

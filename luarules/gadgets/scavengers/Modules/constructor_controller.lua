@@ -1,18 +1,44 @@
 Spring.Echo("[Scavengers] Constructor Controller initialized")
 
 VFS.Include("luarules/gadgets/scavengers/Configs/"..GameShortName.."/UnitLists/constructors.lua")
-Blueprints2List = VFS.DirList('luarules/gadgets/scavengers/Blueprints/Constructor/','*.lua')
+Blueprints2List = VFS.DirList('luarules/gadgets/scavengers/Blueprints/'..GameShortName..'/Constructor/','*.lua')
 for i = 1,#Blueprints2List do
 	VFS.Include(Blueprints2List[i])
 	Spring.Echo("Scav Blueprints Directory: " ..Blueprints2List[i])
 end
-local constructortimer = constructorControllerModule.constructortimer - 10
+local constructortimer = constructorControllerModuleConfig.constructortimerstart
+
+function AssistantOrders(n, scav)
+	local x,y,z = Spring.GetUnitPosition(scav)
+	Spring.GiveOrderToUnit(scav, CMD.PATROL,{x-100,y,z}, {"shift"})
+	Spring.GiveOrderToUnit(scav, CMD.PATROL,{x+100,y,z}, {"shift"})
+	Spring.GiveOrderToUnit(scav, CMD.PATROL,{x,y,z-100}, {"shift"})
+	Spring.GiveOrderToUnit(scav, CMD.PATROL,{x,y,z+100}, {"shift"})
+end
+
+function ResurrectorOrders(n, scav)
+	local mapcenterX = mapsizeX/2
+	local mapcenterZ = mapsizeZ/2
+	local mapcenterY = Spring.GetGroundHeight(mapcenterX, mapcenterZ)
+	local mapdiagonal = math.ceil(math.sqrt((mapsizeX*mapsizeX)+(mapsizeZ*mapsizeZ)))
+	Spring.GiveOrderToUnit(scav, CMD.RESURRECT,{mapcenterX+math.random(-100,100),mapcenterY,mapcenterZ+math.random(-100,100),mapdiagonal}, {})
+	--Spring.GiveOrderToUnit(scav, CMD.RECLAIM,{mapcenterX+math.random(-100,100),mapcenterY,mapcenterZ+math.random(-100,100),mapdiagonal}, {"shift"})
+end
+
+function CollectorOrders(n, scav)
+	local mapcenterX = mapsizeX/2
+	local mapcenterZ = mapsizeZ/2
+	local mapcenterY = Spring.GetGroundHeight(mapcenterX, mapcenterZ)
+	local mapdiagonal = math.ceil(math.sqrt((mapsizeX*mapsizeX)+(mapsizeZ*mapsizeZ)))
+	Spring.GiveOrderToUnit(scav, CMD.RECLAIM,{mapcenterX+math.random(-100,100),mapcenterY,mapcenterZ+math.random(-100,100),mapdiagonal}, {})
+	--Spring.GiveOrderToUnit(scav, CMD.RECLAIM,{mapcenterX+math.random(-100,100),mapcenterY,mapcenterZ+math.random(-100,100),mapdiagonal}, {"shift"})
+end
 
 function SpawnConstructor()
-	local posx = math.random(200,mapsizeX-200)
-	local posz = math.random(200,mapsizeZ-200)
+	local posx = math.random(250,mapsizeX-250)
+	local posz = math.random(250,mapsizeZ-250)
 	local posy = Spring.GetGroundHeight(posx, posz)
-	local posradius = 30
+	local posradius = 48
 	canSpawnCommanderHere = posCheck(posx, posy, posz, posradius)
 	if canSpawnCommanderHere then
 		canSpawnCommanderHere = posLosCheck(posx, posy, posz,posradius)
@@ -21,10 +47,40 @@ function SpawnConstructor()
 		canSpawnCommanderHere = posOccupied(posx, posy, posz, posradius)
 	end
 	if canSpawnCommanderHere then
-		if constructortimer > constructorControllerModule.constructortimer then
-			constructortimer = constructortimer - constructorControllerModule.constructortimer
+		if constructortimer > constructorControllerModuleConfig.constructortimer then
+			constructortimer = constructortimer - constructorControllerModuleConfig.constructortimer
 			local r = ConstructorsList[math.random(1,#ConstructorsList)]
+			local r2 = Resurrectors[math.random(1,#Resurrectors)]
+			local r3 = ResurrectorsSea[math.random(1,#ResurrectorsSea)]
+			Spring.CreateUnit("scavengerdroppod_scav", posx, posy, posz, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx+posradius, posy, posz, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx-posradius, posy, posz, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx, posy, posz+posradius, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx, posy, posz-posradius, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx+posradius, posy, posz+posradius, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx-posradius, posy, posz+posradius, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx-posradius, posy, posz-posradius, math.random(0,3),GaiaTeamID)
+			Spring.CreateUnit("scavengerdroppod_scav", posx+posradius, posy, posz-posradius, math.random(0,3),GaiaTeamID)
 			Spring.CreateUnit(r..scavconfig.unitnamesuffix, posx, posy, posz, math.random(0,3),GaiaTeamID)
+			if posy > 0 then
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx+32, posy, posz, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx-32, posy, posz, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx, posy, posz+32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx, posy, posz-32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx+32, posy, posz+32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx-32, posy, posz-32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx-32, posy, posz+32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r2..scavconfig.unitnamesuffix, posx+32, posy, posz-32, math.random(0,3),GaiaTeamID)
+			else
+				--Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx+32, posy, posz, math.random(0,3),GaiaTeamID)
+				--Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx-32, posy, posz, math.random(0,3),GaiaTeamID)
+				--Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx, posy, posz+32, math.random(0,3),GaiaTeamID)
+				--Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx, posy, posz-32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx+32, posy, posz+32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx-32, posy, posz-32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx-32, posy, posz+32, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit(r3..scavconfig.unitnamesuffix, posx+32, posy, posz-32, math.random(0,3),GaiaTeamID)
+			end
 		else
 			constructortimer = constructortimer + 1
 		end
@@ -47,13 +103,11 @@ function ConstructNewBlueprint(n, scav)
 				blueprint = ScavengerConstructorBlueprintsT2[math.random(1,#ScavengerConstructorBlueprintsT2)]
 			end
 		elseif n > scavconfig.timers.Tech2 then
-			local r = math.random(0,2)
+			local r = math.random(0,1)
 			if r == 0 then
 				blueprint = ScavengerConstructorBlueprintsT2[math.random(1,#ScavengerConstructorBlueprintsT2)]
-			elseif r == 1 then
-				blueprint = ScavengerConstructorBlueprintsT1[math.random(1,#ScavengerConstructorBlueprintsT1)]
 			else
-				blueprint = ScavengerConstructorBlueprintsT0[math.random(1,#ScavengerConstructorBlueprintsT0)]
+				blueprint = ScavengerConstructorBlueprintsT1[math.random(1,#ScavengerConstructorBlueprintsT1)]
 			end
 		elseif n > scavconfig.timers.Tech1 then
 			local r = math.random(0,1)
@@ -67,24 +121,18 @@ function ConstructNewBlueprint(n, scav)
 		end
 	elseif posy <= 0 then	
 		if n > scavconfig.timers.Tech3 then
-			local r = math.random(0,3)
+			local r = math.random(0,1)
 			if r == 0 then
 				blueprint = ScavengerConstructorBlueprintsT3Sea[math.random(1,#ScavengerConstructorBlueprintsT3Sea)]
-			elseif r == 1 then
-				blueprint = ScavengerConstructorBlueprintsT2Sea[math.random(1,#ScavengerConstructorBlueprintsT2Sea)]
-			elseif r == 2 then
-				blueprint = ScavengerConstructorBlueprintsT1Sea[math.random(1,#ScavengerConstructorBlueprintsT1Sea)]
 			else
-				blueprint = ScavengerConstructorBlueprintsT0Sea[math.random(1,#ScavengerConstructorBlueprintsT0Sea)]
+				blueprint = ScavengerConstructorBlueprintsT2Sea[math.random(1,#ScavengerConstructorBlueprintsT2Sea)]
 			end
 		elseif n > scavconfig.timers.Tech2 then
-			local r = math.random(0,2)
+			local r = math.random(0,1)
 			if r == 0 then
 				blueprint = ScavengerConstructorBlueprintsT2Sea[math.random(1,#ScavengerConstructorBlueprintsT2Sea)]
-			elseif r == 1 then
-				blueprint = ScavengerConstructorBlueprintsT1Sea[math.random(1,#ScavengerConstructorBlueprintsT1Sea)]
 			else
-				blueprint = ScavengerConstructorBlueprintsT0Sea[math.random(1,#ScavengerConstructorBlueprintsT0Sea)]
+				blueprint = ScavengerConstructorBlueprintsT1Sea[math.random(1,#ScavengerConstructorBlueprintsT1Sea)]
 			end
 		elseif n > scavconfig.timers.Tech1 then
 			local r = math.random(0,1)

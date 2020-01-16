@@ -1,7 +1,7 @@
 
 Spring.Echo("[Scavengers] Building spawner initialized")
 
-BlueprintsList = VFS.DirList('luarules/gadgets/scavengers/Blueprints/Spawner/','*.lua')
+BlueprintsList = VFS.DirList('luarules/gadgets/scavengers/Blueprints/'..GameShortName..'/Spawner/','*.lua')
 for i = 1,#BlueprintsList do
 	VFS.Include(BlueprintsList[i])
 	Spring.Echo("Scav Blueprints Directory: " ..BlueprintsList[i])
@@ -9,6 +9,11 @@ end
 
 function SpawnBlueprint(n)
 	if n > scavconfig.timers.Tech0 then
+		-- this doesnt work
+		-- if teamcount == 0 then
+  --  		teamcount = 1
+  --  		if allyteamcount == 0 then
+  --  		allyteamcount = 1
 		local gaiaUnitCount = Spring.GetTeamUnitCount(GaiaTeamID)
 		local spawnchance = math.random(0,buildingSpawnerModuleConfig.spawnchance)
 		if spawnchance == 0 or canBuildHere == false then
@@ -87,6 +92,14 @@ function SpawnBlueprint(n)
 			if canBuildHere then
 				-- let's do this shit
 				blueprint(posx, posy, posz, GaiaTeamID, false)
+				Spring.CreateUnit("scavengerdroppod_scav", posx+posradius, posy, posz, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit("scavengerdroppod_scav", posx-posradius, posy, posz, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit("scavengerdroppod_scav", posx, posy, posz+posradius, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit("scavengerdroppod_scav", posx, posy, posz-posradius, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit("scavengerdroppod_scav", posx+posradius, posy, posz+posradius, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit("scavengerdroppod_scav", posx-posradius, posy, posz+posradius, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit("scavengerdroppod_scav", posx-posradius, posy, posz-posradius, math.random(0,3),GaiaTeamID)
+				Spring.CreateUnit("scavengerdroppod_scav", posx+posradius, posy, posz-posradius, math.random(0,3),GaiaTeamID)
 			end
 		end
 	end
