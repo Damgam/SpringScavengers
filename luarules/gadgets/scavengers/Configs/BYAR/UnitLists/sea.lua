@@ -15,7 +15,7 @@ T1SeaUnits = {
 "correcl",
 "corpship",
 "corsub",
-"corgarpike",
+"corgarp",
 --hovercraft
 "armsh",
 "armmh",
@@ -60,4 +60,9 @@ T3SeaUnits = {
 --hovercraft
 "armlun",
 "corsok",
+}
+
+T4SeaUnits = {
+"corcrwbosst2",
+"corcrwbosst2",
 }
