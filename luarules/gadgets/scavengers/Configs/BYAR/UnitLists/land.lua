@@ -55,6 +55,7 @@ T2LandUnits = {
 	"armamph",
 	"armfido",
 	"armzeus",
+	"armspy",
 	"armaak",
 	"armsnipe",
 	"armmav",
@@ -65,6 +66,7 @@ T2LandUnits = {
 	"cormort",
 	"coramph",
 	"corsktl",
+	"corspy",
 	"corcan",
 	"coraak",
 	"cortermite",
@@ -121,6 +123,7 @@ T3LandUnits = {
 	--hovercraft
 	"armlun",
 	"corsok",
+	"armsptkboss",
 }
 
 T4LandUnits = {
@@ -134,4 +137,5 @@ T4LandUnits = {
 	"armfepoch",
 	"corfblackhy",
 	"corcrwboss",
+	"armsptkboss",
 }

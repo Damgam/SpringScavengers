@@ -1,5 +1,7 @@
 Spring.Echo("[Scavengers] Config initialized")
 
+adder = 300
+multiplier = 1
 -- Config for Scavengers Survival AI
 if scavengersAIEnabled then
 	scavconfig = {
@@ -12,14 +14,14 @@ if scavengersAIEnabled then
 		unitnamesuffix = "_scav",
 		messenger = true, -- BYAR specific thing, don't enable otherwise (or get gui_messages.lua from BYAR)
 		modules = {
-			buildingSpawnerModule 			= false,
-			constructorControllerModule 	= true,
-			factoryControllerModule 		= true,
-			unitSpawnerModule 				= true,
-			startBoxProtection				= true,
-			reinforcementsModule			= false,
-			stockpilers						= true,
-			nukes							= true,
+			buildingSpawnerModule 			= true, --building spawner spawns random blueprints around map
+			constructorControllerModule 	= true, --constructor controller is for units that build blueprints
+			factoryControllerModule 		= true, --factory controller is to give orders to factories
+			unitSpawnerModule 				= true, --spawns units
+			startBoxProtection				= true, --spawns turrets around the startboxes (if you are using startboxes) and damages units inside of it
+			reinforcementsModule			= true, --reinforcements adds beacon capturing and friendly drops
+			stockpilers						= false, --stockpilers adds controller for units with stockpile mechanic
+			nukes							= true, --nukes gives orders to nuke units
 		},
 		
 		scoreConfig = {
@@ -33,33 +35,34 @@ if scavengersAIEnabled then
 				-- Additional score for specific unit types, use -baseScorePerKill(default 1) to make it have no effect on score, use values lower than baseScorePerKill to reduce score
 				scorePerKilledBuilding 			= 4,
 				scorePerKilledConstructor 		= 99,
-				scorePerKilledSpawner 			= -1,
-				scorePerCapturedSpawner 		= 50, -- this doesn't care about baseScorePerKill 
+				scorePerKilledSpawner 			= 49,
+				scorePerCapturedSpawner 		= -51, -- this doesn't care about baseScorePerKill 
 		},
+		
 		timers = {
 			-- globalScore values
 			T0start								= 1,
-			T1start								= 600,
-			T1low								= 900,
-			T1med								= 1200,
-			T1high								= 1500,
-			T1top								= 1800,
-			T2start								= 2250,
-			T2low								= 3000,
-			T2med								= 3750,
-			T2high								= 4500,
-			T2top								= 6000,
-			T3start								= 7500,
-			T3low								= 9000,
-			T3med								= 10500,
-			T3high								= 12000,
-			T3top								= 13500,
-			T4start								= 15000,
-			T4low								= 18000,
-			T4med								= 21000,
-			T4high								= 24000,
-			T4top								= 28000,
-			BossFight							= 28001,
+			T1start								= 150+adder*multiplier,
+			T1low								= 300+adder*multiplier,
+			T1med								= 450+adder*multiplier,
+			T1high								= 600+adder*multiplier,
+			T1top								= 750+adder*multiplier,
+			T2start								= 900+adder*multiplier,
+			T2low								= 1050+adder*multiplier,
+			T2med								= 1200+adder*multiplier,
+			T2high								= 1350+adder*multiplier,
+			T2top								= 1500+adder*multiplier,
+			T3start								= 1750+adder*multiplier,
+			T3low								= 2000+adder*multiplier,
+			T3med								= 2250+adder*multiplier,
+			T3high								= 2500+adder*multiplier,
+			T3top								= 2750+adder*multiplier,
+			T4start								= 3000+adder*multiplier,
+			T4low								= 3250+adder*multiplier,
+			T4med								= 3500+adder*multiplier,
+			T4high								= 3750+adder*multiplier,
+			T4top								= 4000+adder*multiplier,
+			BossFight							= 4001+adder*multiplier,
 			-- don't delete
 			NoRadar								= 1200,
 		},
@@ -78,14 +81,14 @@ if scavengersAIEnabled then
 	unitSpawnerModuleConfig = {
 		bossFightEnabled					= true,
 		FinalBossUnit						= true,
-		BossWaveTimeLeft					= 900,
-		aircraftchance 						= 6, -- higher number = lower chance
+		BossWaveTimeLeft					= 300,
+		aircraftchance 						= 20, -- higher number = lower chance
 		globalscoreperoneunit 				= 900,
 		spawnchance							= 120,
 		beaconspawnchance					= 120,
-		minimumspawnbeacons					= 3,
+		minimumspawnbeacons					= 2,
 		landmultiplier 						= 0.75,
-		airmultiplier 						= 2.0,
+		airmultiplier 						= 2,
 		seamultiplier 						= 0.2,
 		chanceforaircraftonsea				= 2, -- higher number = lower chance
 
@@ -98,13 +101,13 @@ if scavengersAIEnabled then
 
 	constructorControllerModuleConfig = {
 		constructortimerstart				= 120, -- ammount of seconds it skips from constructortimer for the first spawn (make first spawn earlier - this timer starts on timer-Timer1)
-		constructortimer 					= 240, -- time in seconds between commander/constructor spawns
+		constructortimer 					= 220, -- time in seconds between commander/constructor spawns
 		constructortimerreductionframes		= 36000,
-		minimumconstructors					= 2,
-		useresurrectors						= true,
+		minimumconstructors					= 5,
+		useresurrectors						= false,
 			searesurrectors					= false,
 		useconstructors						= true,
-		usecollectors						= true,
+		usecollectors						= false,
 	}
 
 	unitControllerModuleConfig = {
@@ -116,10 +119,9 @@ if scavengersAIEnabled then
 	}
 
 
-
 	-- Functions which you can configure
 	function CountScavConstructors()
-		return UDC(GaiaTeamID, UDN.corcom_scav.id) + UDC(GaiaTeamID, UDN.armcom_scav.id)
+		return UDC(GaiaTeamID, UDN.ecommander.id) + UDC(GaiaTeamID, UDN.ecommanderbattle.id)
 	end
 
 	function UpdateTierChances(n)
@@ -281,7 +283,7 @@ else
 			unitSpawnerModule 				= true,
 			startBoxProtection				= false,
 			reinforcementsModule			= false,
-			stockpilers						= true,
+			stockpilers						= false,
 			nukes							= true,
 		},
 		
@@ -347,7 +349,7 @@ else
 		globalscoreperoneunit 				= 800,
 		spawnchance							= 120,
 		beaconspawnchance					= 360,
-		minimumspawnbeacons					= 1,
+		minimumspawnbeacons					= 2,
 		landmultiplier 						= 0.75,
 		airmultiplier 						= 1.5,
 		seamultiplier 						= 0.2,
@@ -361,15 +363,14 @@ else
 	}
 
 	constructorControllerModuleConfig = {
-		constructortimerstart				= 140, -- ammount of seconds it skips from constructortimer for the first spawn (make first spawn earlier - this timer starts on timer-Timer1)
-		constructortimer 					= 260, -- time in seconds between commander/constructor spawns
+		constructortimerstart				= 120, -- ammount of seconds it skips from constructortimer for the first spawn (make first spawn earlier - this timer starts on timer-Timer1)
+		constructortimer 					= 220, -- time in seconds between commander/constructor spawns
 		constructortimerreductionframes		= 36000,
-		minimumconstructors					= 2,
-		useresurrectors						= true,
+		minimumconstructors					= 1,
+		useresurrectors						= false,
 			searesurrectors					= false,
 		useconstructors						= true,
-		usecollectors						= true,
-
+		usecollectors						= false,
 	}
 
 	unitControllerModuleConfig = {
@@ -383,12 +384,11 @@ else
 
 	-- Functions which you can configure
 	function CountScavConstructors()
-		return UDC(GaiaTeamID, UDN.corcom_scav.id) + UDC(GaiaTeamID, UDN.armcom_scav.id)
+		return UDC(GaiaTeamID, UDN.ecommander.id) + UDC(GaiaTeamID, UDN.ecommanderbattle.id)
 	end
 
 	function UpdateTierChances(n)
 		-- Must be 100 in total
-
 		if globalScore > scavconfig.timers.T4top then
 			TierSpawnChances.T0 = 0
 			TierSpawnChances.T1 = 0
